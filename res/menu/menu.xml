@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/item_change_alias" android:titleCondensed="..Alias.." android:title="@string/change_alias" android:visible="true" android:enabled="true" android:menuCategory="system" android:checkable="false"></item>
+    <item android:id="@+id/itemsend_file" android:titleCondensed="..Send.." android:title="@string/send_file" android:visible="true" android:enabled="true" android:menuCategory="system" android:checkable="false"></item>
+    <item android:id="@+id/item_emojis" android:titleCondensed="..Emojis.." android:title="@string/emojis" android:visible="true" android:menuCategory="system" android:checkable="false"></item>
+    
+
+</menu>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">FileStreamClient</string>
+    <string name="dummy_button">Login</string>
+    <string name="dummy_content">Alias</string>
+    <string name="dummy_hint">Please type alias.</string>
+    <string name="hello_world">Hello World</string>
+    <string name="change_alias">Change Alias</string>
+    <string name="send_file">Send File</string>
+    <string name="emojis">Emojis</string>
+    <string name="send">Send</string>
+
+</resources>

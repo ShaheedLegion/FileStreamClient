@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "filestreamclient",
+    "project_number": "558136167287",
+    "name": "FileStreamClient"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558136167287:android:612c3cf4ee8c8237",
+        "client_id": "android:inspirational.designs.filestreamclient",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "inspirational.designs.filestreamclient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "558136167287-f1lesdcasa71hikh107b6dq7qto7nui8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "inspirational.designs.filestreamclient",
+            "certificate_hash": "F4CF45129E91FD33FF2C8A89EBCD5412D3D87250"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
