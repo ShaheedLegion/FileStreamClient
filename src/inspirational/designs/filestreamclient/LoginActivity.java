@@ -1,51 +1,37 @@
 package inspirational.designs.filestreamclient;
 
+import java.util.ArrayList;
+import inspirational.designs.filestreamclient.network.ClientSocketConnection.ServerPerson;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.plus.People.LoadPeopleResult;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 
-public class LoginActivity extends Activity implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener, ResultCallback<LoadPeopleResult> {
+public class LoginActivity extends Activity {
 	public final static String ALIAS_NAME = "inspirational.designs.filestreamclient.ALIAS_NAME";
 	public final static String ALIAS_PHOTO = "inspirational.designs.filestreamclient.ALIAS_PHOTO";
 	public final static String ALIAS_EMAIL = "inspirational.designs.filestreamclient.ALIAS_EMAIL";
-	
-	private final static int PROFILE_PIC_SIZE = 400;
-	private final static int RC_SIGN_IN = 0;
-	private GoogleApiClient mGoogleApiClient;
-	private boolean mIntentInProgress;
-	private boolean mShouldResolve;
-	private ConnectionResult connectionResult;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_login);
-		
-		mGoogleApiClient = new GoogleApiClient.Builder(this)
-        .addConnectionCallbacks(this)
-        .addOnConnectionFailedListener(this)
-        .addApi(Plus.API)
-        .addScope(Plus.SCOPE_PLUS_LOGIN)
-        .build();
 	}
 
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
@@ -54,110 +40,76 @@ public class LoginActivity extends Activity implements GoogleApiClient.Connectio
 	}
 
 	@Override
-	public void onConnected(Bundle arg0) {
-		mShouldResolve = false;
-		Log.d("FileStreamClient", "OnConnected");
-	    try {
-	    	Plus.PeopleApi.loadVisible(mGoogleApiClient, null).setResultCallback(this);
-	        if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
-	            Person person = Plus.PeopleApi
-	                    .getCurrentPerson(mGoogleApiClient);
-	            String personName = person.getDisplayName();
-	            String personPhotoUrl = person.getImage().getUrl();
-	            String email = Plus.AccountApi.getAccountName(mGoogleApiClient);
-
-	            // Add this to class variables so that we can load it into the bundle
-	            // and pass it along to the next activity.
-	            personPhotoUrl = personPhotoUrl.substring(0,
-	                    personPhotoUrl.length() - 2)
-	                    + PROFILE_PIC_SIZE;
-
-	            // Else we can get the alias as a string, then switch views.
-	    		Intent intent = new Intent(this, ChatActivity.class);
-	    		intent.putExtra(ALIAS_NAME, personName);
-	    		intent.putExtra(ALIAS_PHOTO, personPhotoUrl);
-	    		intent.putExtra(ALIAS_EMAIL, email);
-	    		startActivity(intent);
-	            
-	            Toast.makeText(getApplicationContext(),
-	                    "You are Logged In " + personName, Toast.LENGTH_LONG).show();
-	        } else {
-	            Toast.makeText(getApplicationContext(),
-	                    "Couldnt Get the Person Info", Toast.LENGTH_SHORT).show();
-	            Log.d("FileStreamClient", "current person result is null.");
-	            mIntentInProgress = true;
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        Log.d("FileStreamClient", e.getMessage());
-	    }
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		onPeopleLoaded();
 	}
 
-	@Override
-	public void onConnectionSuspended(int arg0) {
-		mGoogleApiClient.connect();
-		Log.d("FileStreamClient", "onConnectionSuspended");
+	public void onPeopleLoaded() {
+		{
+			// First populate our current users list.
+			ArrayList<ServerPerson> people = PersonInfo.getInstance().getServerPeople();
+			for (ServerPerson person : people) {
+				PersonInfo.getInstance().addUser(person.name, person.image, "no-email", null);
+			}
+		}
+		ListView lv = (ListView)findViewById(R.id.listView8);
+		if (lv != null) {
+			lv.setAdapter(new PeopleAdapter(getBaseContext(), R.layout.chat_rowlayout , PersonInfo.getInstance().getServerPeople()));
+			lv.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View arg1,
+						int arg2, long arg3) {
+					personChosen(arg2);
+				}});
+		}
+		TextView tv = (TextView)findViewById(R.id.fullscreen_content2);
+		if (tv != null)
+			tv.setText("Choose your alias...");
 	}
 
-	@Override
-	public void onConnectionFailed(ConnectionResult result) {
-		Log.d("FileStreamClient", "onConnectionFailed");
-		if (!result.hasResolution()) {
-	        GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this, 0).show();
-	        return;
-	    }
+	
+	public void personChosen(int index) {
+		Log.d("FileStreamClient", "User chose an alias!");
+		ServerPerson user = PersonInfo.getInstance().getServerPeople().get(index);
 
-	    if (!mIntentInProgress) {
-	        connectionResult = result;
-	        if (mShouldResolve) {
-	            resolveSignInError();
-	        }
-	    }
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
-		Log.d("FileStreamClient", "OnActivityResult " + requestCode + " " + responseCode);
-	    if (requestCode == RC_SIGN_IN) {
-	        if (responseCode != RESULT_OK) {
-	            mShouldResolve = false;
-	        } else {
-	        	Log.d("FileStreamClient", "response code is already ok, seems to be logged in.");
-	        }
-
-	        mIntentInProgress = false;
-
-	        if (!mGoogleApiClient.isConnecting()) {
-	            mGoogleApiClient.connect();
-	        }
-	    }
+        // Else we can get the alias as a string, then switch views.
+		Intent intent = new Intent(this, ChatActivity.class);
+		intent.putExtra(ALIAS_NAME, user.name);
+		intent.putExtra(ALIAS_PHOTO, user.image);
+		intent.putExtra(ALIAS_EMAIL, "no-email");
+		startActivity(intent);
 	}
 	
-	protected void onStart() {
-	    super.onStart();
-	    mGoogleApiClient.connect();
-	}
+	class PeopleAdapter extends ArrayAdapter<ServerPerson> {
+		private final ArrayList<ServerPerson> users;
+		private final Context context;
 
-	protected void onStop() {
-	    super.onStop();
-	    if (mGoogleApiClient.isConnected()) {
-	        mGoogleApiClient.disconnect();
-	    }
+		public PeopleAdapter(Context context, int resource,
+				ArrayList<ServerPerson> objects) {
+			super(context, resource, objects);
+			this.users = objects;
+			this.context = context;
+		}
+		
+		@SuppressLint("ViewHolder")
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			LayoutInflater inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View rowView = inflater.inflate(R.layout.chat_rowlayout, parent,
+					false);
+			TextView textView = (TextView) rowView.findViewById(R.id.label);
+			ServerPerson user = this.users.get(position);
+			textView.setText(user.name);
+			return rowView;
+		}
+
+		@Override
+		public int getCount() {
+			return this.users.size();
+		}
+		
 	}
 	
-	private void resolveSignInError() {
-	    if (connectionResult != null && connectionResult.hasResolution()) {
-	        try {
-	            mIntentInProgress = true;
-	            connectionResult.startResolutionForResult(this, RC_SIGN_IN);
-	        } catch (SendIntentException e) {
-	            mIntentInProgress = false;
-	            mGoogleApiClient.connect();
-	        }
-	    }
-	}
-
-	@Override
-	public void onResult(LoadPeopleResult arg0) {
-	}
 }

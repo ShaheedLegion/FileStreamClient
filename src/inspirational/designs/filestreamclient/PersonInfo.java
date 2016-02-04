@@ -1,5 +1,7 @@
 package inspirational.designs.filestreamclient;
 
+import inspirational.designs.filestreamclient.network.ClientSocketConnection.ServerPerson;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,7 @@ public class PersonInfo {
 	private PersonDetails currentUser = null;
 	private List<PersonDetails> users = new ArrayList<PersonDetails>();
 	private static PersonInfo instance = null;
+	private ArrayList<ServerPerson> people = new ArrayList<ServerPerson>();
 	
 	public static PersonInfo getInstance() {
 		if (instance == null)
@@ -88,6 +91,10 @@ public class PersonInfo {
 	
 	private PersonInfo() {
 		
+	}
+	
+	public ArrayList<ServerPerson> getServerPeople() {
+		return people;
 	}
 	
 	public void setCurrentUser(String name, String photo, String email, PersonImageLoaded loadedInterface) {
@@ -125,4 +132,6 @@ public class PersonInfo {
 	public PersonDetails getCurrentUser() {
 		return currentUser;
 	}
+	
+	public List<PersonDetails> getUserList() { return users; }
 }

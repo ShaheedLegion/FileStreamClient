@@ -1,7 +1,5 @@
 package inspirational.designs.filestreamclient.fragments;
 
-import java.util.ArrayList;
-
 import inspirational.designs.filestreamclient.PersonInfo;
 import inspirational.designs.filestreamclient.PersonInfo.PersonDetails;
 import inspirational.designs.filestreamclient.R;
@@ -35,12 +33,12 @@ public class PeopleListFragment extends ListFragment {
 	public static PeopleListFragment init(int val) {
 		PeopleListFragment peopleList;
 		
-		if (instance == null)
+		if (instance == null) {
 			peopleList = new PeopleListFragment();
-		else 
+		} else 
 			peopleList = instance;
 
-		// Supply val input as an argument.
+		// Supply val input as an argument. change
 		Bundle args = new Bundle();
 		args.putInt("val", val);
 		peopleList.setArguments(args);
@@ -148,22 +146,18 @@ public class PeopleListFragment extends ListFragment {
 	
 	public class PeopleListAdapter extends ArrayAdapter<String> {
 		private final Context context;
-		private final ArrayList<PersonInfo.PersonDetails> users;
 		private ListView listView;
 
 		public PeopleListAdapter(Context context) {
 			super(context, -1);
 			this.context = context;
-			this.users = new ArrayList<PersonInfo.PersonDetails>();
 			this.listView = null;
 		}
 
 		public PeopleListAdapter(PeopleListFragment peopleListFragment, ListView listView,
 				int simpleListItem1) {
 			super(peopleListFragment.getActivity().getBaseContext(), -1);
-
 			this.context = peopleListFragment.getActivity().getBaseContext();
-			this.users = new ArrayList<PersonInfo.PersonDetails>();
 			this.listView = listView;
 		}
 
@@ -175,7 +169,7 @@ public class PeopleListFragment extends ListFragment {
 			View rowView = inflater.inflate(R.layout.chat_rowlayout, parent,
 					false);
 			TextView textView = (TextView) rowView.findViewById(R.id.label);
-			PersonInfo.PersonDetails user = this.users.get(position);
+			PersonInfo.PersonDetails user = PersonInfo.getInstance().getUserList().get(position);
 			if (user != null) {
 				if (user.getPhoto() != null) {
 					ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
@@ -188,12 +182,10 @@ public class PeopleListFragment extends ListFragment {
 
 		@Override
 		public int getCount() {
-			return this.users.size();
+			return PersonInfo.getInstance().getUserList().size();
 		}
 		
 		public void addUser(PersonInfo.PersonDetails user) {
-			// First check if it's an ack from the server.
-			this.users.add(user);
 			super.notifyDataSetChanged();
 			
 			if (this.listView != null) {

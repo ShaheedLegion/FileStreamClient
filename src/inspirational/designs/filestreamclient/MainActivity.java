@@ -13,7 +13,7 @@ import android.view.View;
 
 public class MainActivity extends Activity {
 	private SystemUiHider mSystemUiHider;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 		@Override
 		protected Void doInBackground(Void... params) {
 			Log.d("FileStreamClient", "Calling the connect function.");
-			ClientSocketConnection.getInstance().connect();
+			ClientSocketConnection.getInstance().connect(PersonInfo.getInstance().getServerPeople());
 			return null;
 		}
 
